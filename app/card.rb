@@ -134,6 +134,7 @@ class Deck
 		@whole = Array.new(@@deck_size, nil).map.with_index{|n, i| Card.create_card(@deck_position)} # Todo: create deck from data file (JSON)
 		@whole.shuffle!
 		@hand = []
+		@redraw_deck = true
 	end
 
 	def next_hand
@@ -149,6 +150,8 @@ class Deck
 			c.initial_position = {x: c.x, y: c.y}
 			c.initial_angle = c.angle
 		end
+
+		@redraw_deck = true
 	end
 
 	def clear_hand
@@ -177,8 +180,8 @@ class Deck
 	private
 	
 	def draw_deck args
-		# Todo store deck size and redraw if change
-		if then
+		# Deck is re-draw only if it's size change (for performance purpose) 
+		if @redraw_deck then
 			last_card_x = 0 
 			args.render_target(:deck_card_target).sprites << @whole.map.with_index do |c, i|
 				last_card_x = c.x+(i*3)
@@ -186,7 +189,9 @@ class Deck
 			end
 
 			text_w, text_h = args.gtk.calcstringbox("#{@whole.length}", 0, "font.ttf")
-			args.args.render_target(:deck_label_target).labels << {x: last_card_x + (Card.card_width/2 - text_w/2), y: @deck_position.y + (Card.card_height/2 + text_h/2), text: @whole.length}
+			args.render_target(:deck_label_target).labels << {x: last_card_x + (Card.card_width/2 - text_w/2), y: @deck_position.y + (Card.card_height/2 + text_h/2), text: @whole.length}
+
+			@redraw_deck = false
 		end
 
   		args.outputs.sprites << { x: 0, y: 0, w: args.grid.right, h: args.grid.top, path: :deck_card_target}

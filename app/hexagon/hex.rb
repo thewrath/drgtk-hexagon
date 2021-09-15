@@ -106,7 +106,7 @@ class Hex
 end
 
 class HexType < Sprite
-	attr_accessor :q, :r
+	attr_accessor :q, :r, :type
 	@@castle = 0
 	@@tower = 1
 	@@water = 2
@@ -119,6 +119,7 @@ class HexType < Sprite
 		@w = 64
 		@h = 64
 		@path = HexType.types[type]
+		@type = type
 	end
 
 	def self.types
@@ -251,6 +252,10 @@ class HexMap
 
 	def center()
 		Hex.new(0, 0)
+	end
+
+	def only_of(types)
+		@hexes.zip(@hexesType).reject {|h| not types.include? h[1].type}
 	end
 
 	def ring(radius, start)

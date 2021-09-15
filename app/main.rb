@@ -34,7 +34,7 @@ def tick args
 
   # Draw hex map
   if !args.state.render_target.valid then
-    compute_hex_map_render_targets args  
+    compute_hex_map_render_targets args
   end
 
   # Draw hex map render targets
