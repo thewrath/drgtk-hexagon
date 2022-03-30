@@ -1,0 +1,32 @@
+* Ideas
+  - Each tiles handle resources
+    - Type of resources :
+      - Wheat (Gold to create field)
+      - Population (Gold to create building, taxes => gold)
+      - Gold (earn with taxes)
+      - Army (Wheat + Population)
+    - Type of tiles :
+      - Castle (only one that the player need to defend).
+      - Field (to grow resource (wheat that soldier consume)).
+      - Building (Building for the soldiers to settle and have population).
+      - Neutral => army can go
+  - Card effect is for a ring of tiles (player need to dose).
+    - Card effects :
+      - Create Army (only useable on castle and row with a building tile)
+      - Randomly turn a tile in another (building) (need gold)
+      - Fertilize field (damage to building) (need gold)
+      - Castle enhancements :
+        - More PV
+        - Can handle more gold
+        - ...
+  - Special effect for tiles neighborhood :
+    - Building => become big building with two other building around
+    - Field => more productive if form a line
+    - 
+  - Army can take take control of castle (they create soldier).
+  - Each row played the game update (army move, field grow, ...) (CryptoDancer ?). 
+* Todo
+  - [x] Draw deck
+  - [x] Draw hand
+  - [x] Handle card event
+  - [] Homogenize API (view, model and use tick instead of update/draw)

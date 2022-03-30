@@ -11,7 +11,7 @@ require 'app/turn.rb'
 require 'app/card.rb'
 require 'app/resource.rb'
 
-MapRadius = 3
+MapRadius = 4
 HexSize = 42
 
 # Program entry point
@@ -22,7 +22,6 @@ def tick args
   # Print FPS
   args.state.debug_labels << "FPS : #{args.gtk.current_framerate.round}"
   args.state.debug_labels << "Frame : #{args.state.tick_count}"
-  args.state.debug_labels << "Turn : #{args.state.game.current_turn.number}"
   # args.state.debug_labels << "Mouse : (#{args.inputs.mouse.x}, #{args.inputs.mouse.y})"
   # args.state.debug_labels << "Hex : (#{args.state.hovered_hex.q}, #{args.state.hovered_hex.r})"
   # args.state.debug_labels << "Ring size : #{args.state.ring_size}"
@@ -43,7 +42,8 @@ def tick args
   args.outputs.sprites << { x: 0, y: 0, w: args.grid.right, h: args.grid.top, path: :hex_map_ring}
 
   # Update player deck
-  args.state.deck.tick(args) {|hand, c| on_card_used(hand, c, args)}
+  args.state.deck.view.tick(args) {|hand, c| on_card_used(hand, c, args)}
+  args.state.deck.view.draw(args)
 
   # Do game update
   args.state.turn_manager.tick args
@@ -68,7 +68,7 @@ def compute_hex_map_render_targets args
 
   args.state.map.render do |center, corners, hex, hexType, hi|
     # Color depending if hexes is in ring or not
-    hexColor = {r: 0, g: 0, b: 0}
+    hexColor = {r: 138, g: 138, b: 138}
 
     last_corner = Point.new(0, 0)
     # Draw each side
@@ -77,7 +77,7 @@ def compute_hex_map_render_targets args
       last_corner = c
     end
 
-    # Draw center of hex
+    # Draw center of hex (only for hexes in current ring)
     if args.state.ring_hexes.include? hex
       size = HexSize/4
       args.render_target(:hex_map_ring).sprites << { x: center.x-(size/2), y: center.y-(size/2), w: args.grid.right, h: args.grid.top, path: :ring_marker}      
@@ -108,13 +108,13 @@ end
 
 def on_turn_start(turn, args)
   puts "Turn start"
-  args.state.deck.next_hand
+  args.state.deck.model.next_hand
   args.state.ring_size = 0 # Put ring size to zero is enought to recompute new hexes ring
 end
 
 def on_turn_end(turn, args)
   puts "Turn stop #{args.state.tick_count}"
-  args.state.deck.clear_hand
+  # args.state.deck.model.clear_hand
 end
 
 def on_card_used(hand, card, args)
@@ -129,7 +129,7 @@ def on_card_used(hand, card, args)
 end
 
 def init args
-  args.outputs.background_color = [255, 255, 255]
+  args.outputs.background_color = [0, 0, 0]
 
   args.state.debug_labels ||= []
 
@@ -149,7 +149,13 @@ def init args
   args.state.turn_manager ||= TurnManager.new(lambda {|t| on_turn_start(t, args) }, lambda {|t| on_turn_end(t, args)} )
 
   # Player deck
-  args.state.deck ||= Deck.new({x: args.grid.right - 200, y: 50}, {x: args.grid.right/4, y: 50})
+  args.state.deck ||= {}
+  args.state.deck.model ||= DeckModel.new()
+  args.state.deck.view ||= DeckView.new(
+    {x: args.grid.right - 200, y: 50},
+    {x: args.grid.right/4, y: 50},
+    args.state.deck.model
+  )
 
   # Player resources
   args.state.store ||= Store.new(Store.initial_resources)

@@ -29,6 +29,7 @@ class TurnManager
 		end
 
   		args.state.debug_labels << "Remaining time : #{(@current_turn.duration - @time).round}"
+	  	args.state.debug_labels << "Turn : #{@current_turn.number}"
 
   		# Display turn start label
   		@turn_start_label.x ||= args.grid.right/2 - 50
